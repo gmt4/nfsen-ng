@@ -21,32 +21,15 @@
                    API object, whose nested values (status, role, tenant) only read well through
                    .label/.name, and which carries id/url/timestamps nobody needs here (#168). #}
                 {% if netboxData is defined and netboxData is not empty %}
+                    {% set ignored = [ 'undefined' ] %}
                     <h3>{{ ip }} (Netbox)</h3>
                     <table class="table table-striped table-hover table-sm">
-                        {% if netboxData.address is defined %}
-                            <tr><th>Address</th><td>{{ netboxData.address }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.dns_name is defined and netboxData.dns_name %}
-                            <tr><th>DNS name</th><td>{{ netboxData.dns_name }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.description is defined and netboxData.description %}
-                            <tr><th>Description</th><td>{{ netboxData.description }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.tenant is defined and netboxData.tenant %}
-                            <tr><th>Tenant</th><td>{{ netboxData.tenant.name }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.vrf is defined and netboxData.vrf %}
-                            <tr><th>VRF</th><td>{{ netboxData.vrf.name }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.status is defined %}
-                            <tr><th>Status</th><td>{{ netboxData.status.label ?? netboxData.status }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.role is defined and netboxData.role %}
-                            <tr><th>Role</th><td>{{ netboxData.role.label ?? netboxData.role }}</td></tr>
-                        {% endif %}
-                        {% if netboxData.assigned_object is defined and netboxData.assigned_object %}
-                            <tr><th>Assigned to</th><td>{{ netboxData.assigned_object.display ?? netboxData.assigned_object.name ?? '' }}</td></tr>
-                        {% endif %}
+                        {% for key, value in netboxData %}
+                            {% if key not in ignored and value is not empty %}
+                                {# providers differ: a nested object would blow up on string conversion #}
+                                <tr><th>{{ key }}</th><td>{{ value is iterable ? value|json_encode : value }}</td></tr>
+                            {% endif %}
+                        {% endfor %}
                     </table>
                 {% endif %}
 
