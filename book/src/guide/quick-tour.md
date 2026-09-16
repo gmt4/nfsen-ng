@@ -3,15 +3,15 @@
 When you open nfsen-ng, you land on the **Graphs** tab — a live traffic
 chart for whatever's currently being captured.
 
-![The five tabs](../images/00-page-graphs.png)
+![The Graphs tab](../images/00-page-graphs.png)
 
 ## The navigation bar
 
 Across the top: a home/reload icon, a dark-mode toggle (moon/sun), a
 reconnect spinner (only appears if your connection to the server drops —
-see below), and the five tabs: **Graphs**, **Flows**, **Statistics**,
-**Sankey**, and **Settings**. Whichever preset (source) you're viewing shows
-in the top-left corner.
+see below), and the tabs: **Graphs**, **Flows**, **Statistics**, **Sankey**,
+and **Settings**. Whichever
+preset (source) you're viewing shows in the top-left corner.
 
 Switching tabs is instant — there's no page reload, and whatever filters you
 had set on a tab are still there when you come back to it.
@@ -40,6 +40,32 @@ querying flow records runs the real `nfdump` tool, which costs real time and
 I/O, so those tabs only run a query when you click their **Process data**
 button. Nothing happens automatically until you do.
 
+While a query runs, the button itself tells you how far along it is, with an
+ETA and a **Kill** button for the times you asked for more than you meant to:
+
+![A running query's progress bar](../images/guide-query-progress.png)
+
+## Seeing when your flows happened
+
+Once you have filtered in **Flows**, expand **Traffic over time** above the
+results to plot that same filter:
+
+![The traffic panel on the Flows tab](../images/09-page-flows-graph.png)
+
+It answers "when did this happen" without describing the query twice. The graph
+plots the filter you already typed, including the min and max byte limits, so
+it shows exactly the traffic the table lists.
+
+Two caveats it states on screen. The row limit and the aggregation options do
+not apply to it, because they truncate and regroup the table rather than change
+which records match — so a table of 100 rows can sit beside a graph of every
+matching byte. And plotting a filter means reading capture files, one nfdump run
+per interval, so it never builds on its own: the panel tells you what it will
+read and waits for you to press **Build graph**.
+
+If the query or the window moves after a build, the panel says so and keeps
+showing what it built, rather than throwing away a graph you waited for.
+
 ## If you see a "Reconnecting…" banner
 
 nfsen-ng pushes live updates to your browser over a persistent connection
@@ -51,6 +77,7 @@ home/reload icon) never hurts if it seems stuck.
 
 ## Where to go next
 
-- [The Dashboard](dashboard.md) — reading the traffic graph
+- [The Dashboard](dashboard.md) — reading the traffic graph, and
+  [graphing only what a filter matches](dashboard.md#asking-a-narrower-question)
 - [Browsing Flows](browsing-flows.md) — searching individual flow records
 - [Setting Up Alerts](alerts.md) — get notified when traffic crosses a threshold

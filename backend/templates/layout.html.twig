@@ -22,6 +22,22 @@
     {# Blocking, and above the stylesheets: data-attr:data-bs-theme is applied by Datastar,
        a module at the end of <body>, so the light frame had already painted (#167).
        Precedence: explicit toggle, else NFSEN_DEFAULT_THEME, else the OS. #}
+    {#
+        The Investigate view was removed once the Flows tab grew its own traffic graph (#166).
+        Anyone who was on it has 'investigate' persisted, and Datastar would restore a view
+        that no longer renders anything — a blank page on their next visit. Rewritten here,
+        before the bundle boots, to the tab that now answers the same question.
+    #}
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('nfsen-persist:_currentView') === '"investigate"') {
+                    localStorage.setItem('nfsen-persist:_currentView', '"flows"');
+                }
+            } catch (e) { /* private mode: nothing was persisted either */ }
+        })();
+    </script>
+
     <script>
         (function () {
             var DEFAULT = {{ (defaults.theme|default('auto'))|json_encode|raw }};
@@ -181,19 +197,21 @@
              style="flex-direction: row"
              data-show="$_currentView != 'settings'"
              data-indicator:nfcapd._counting
-             data-on:change__window__throttle.1000ms="($_currentView === 'flows' || $_currentView === 'statistics' || $_currentView === 'sankey') && evt.target.closest('nfsen-daterange') && @post('{{ countFiles.url() }}')">
+             data-on:change__window__throttle.1000ms="($_currentView === 'flows' || $_currentView === 'statistics' || $_currentView === 'sankey' || ($_currentView === 'graphs' && ${{ graph_mode.id() }} === 'filtered')) && evt.target.closest('nfsen-daterange') && @post('{{ countFiles.url() }}')">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
 
                         {% include 'partials/date-range.html.twig' %}
 
-                        {# View-specific filter panels — all rendered, visibility via data-show #}
-                        <div data-show="$_currentView == 'graphs'" class="col-12">
-                            {% include 'partials/graph-filters.html.twig' %}
-                        </div>
-                        <div data-show="$_currentView == 'flows'" class="col-12" style="display: none;">
-                            {% include 'partials/flow-filters.html.twig' %}
+                        {# View-specific filter panels — all rendered, visibility via data-show. #}
+                        <div>
+                            <div data-show="$_currentView == 'graphs'" class="col-12">
+                                {% include 'partials/graph-filters.html.twig' %}
+                            </div>
+                            <div data-show="$_currentView == 'flows'" class="col-12" style="display: none;">
+                                {% include 'partials/flow-filters.html.twig' %}
+                            </div>
                         </div>
                         <div data-show="$_currentView == 'statistics'" class="col-12" style="display: none;">
                             {% include 'partials/stats-filters.html.twig' %}

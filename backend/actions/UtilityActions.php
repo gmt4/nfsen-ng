@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace mbolli\nfsen_ng\actions;
 
 use mbolli\nfsen_ng\common\IpLookup;
-use mbolli\nfsen_ng\processor\Nfdump;
+use mbolli\nfsen_ng\common\QueryCancel;
+use mbolli\nfsen_ng\processor\NfdumpSlots;
 use Mbolli\PhpVia\Context;
 
 /**
@@ -68,9 +69,16 @@ final class UtilityActions {
         // Safe because SWOOLE_HOOK_ALL makes stream_get_contents coroutine-yielding, so this
         // action runs concurrently with a blocked flow/stats action.
         $c->action(static function (Context $c) use (&$flowNotifications, &$statsNotifications): void {
-            $pid = Nfdump::$runningPid;
+            // Raise the cancel flag first. A chunked run (the filtered graph) forks one
+            // nfdump per time bin, so SIGTERM alone only ends the bin in flight and the
+            // loop marches straight on to the next one — it has to be told to stop.
+            QueryCancel::request($c->getId());
+
+            // This tab's own run and nothing else. The fallback to the 'default' handle that
+            // used to be here belongs to the import daemon and every MCP call, so pressing
+            // Kill with no query of your own in flight SIGTERMed theirs.
+            $pid = NfdumpSlots::kill($c->getId());
             if ($pid !== null && $pid > 0) {
-                posix_kill($pid, SIGTERM);
                 $msg = 'nfdump process (PID ' . $pid . ') was killed.';
                 $flowNotifications = [['id' => bin2hex(random_bytes(4)), 'type' => 'warning', 'message' => $msg]];
                 $statsNotifications = [['id' => bin2hex(random_bytes(4)), 'type' => 'warning', 'message' => $msg]];
