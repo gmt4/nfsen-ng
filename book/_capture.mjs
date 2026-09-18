@@ -274,11 +274,11 @@ window.__afterHeading = function(headingText, headingTag){
 // <tr>s with an occasional colspan group-header row (see HealthChecker.php).
 window.__groupRect = function(groupLabel){
   var rows = [...document.querySelectorAll('table tr')];
-  var startIdx = rows.findIndex(r => { var td = r.querySelector('td[colspan]'); return td && td.textContent.trim() === groupLabel; });
+  var startIdx = rows.findIndex(r => { var c = r.querySelector('[colspan]'); return c && c.textContent.trim() === groupLabel; });
   if (startIdx === -1) return null;
   var endIdx = rows.length;
   for (var i = startIdx + 1; i < rows.length; i++) {
-    if (rows[i].querySelector('td[colspan]')) { endIdx = i; break; }
+    if (rows[i].querySelector('[colspan]')) { endIdx = i; break; }
   }
   var first = rows[startIdx].getBoundingClientRect();
   var last = rows[endIdx - 1].getBoundingClientRect();
@@ -289,8 +289,8 @@ window.__groupRect = function(groupLabel){
 // persisted to localStorage and reflected onto <html data-theme>), toggled
 // by clicking the moon/sun nav icon -- see layout.html.twig's data-init/
 // data-attr:data-theme and nav.html.twig's data-on:click__prevent="$_darkMode
-// = !$_darkMode". Unlike a CSS light-dark()-token app, forcing the OS-level
-// prefers-color-scheme media feature (Emulation.setEmulatedMedia) does nothing
+// = !$_darkMode". The tokens do use light-dark(), but [data-theme] pins the
+// color-scheme either way, so forcing prefers-color-scheme (setEmulatedMedia) does nothing
 // here -- so toggle the real control instead, exactly as a user would.
 async function setDarkMode(on) {
   const isDark = await evaluate(`document.documentElement.getAttribute('data-theme') === 'dark'`);

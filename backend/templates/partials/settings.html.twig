@@ -369,8 +369,8 @@
                             <tbody>
                                 {% for check in healthChecks %}
                                 {% if loop.first or check.group != healthChecks[loop.index0 - 1].group %}
-                                <tr aria-selected="true">
-                                    <td colspan="2" class="muted strong upper" style="letter-spacing:.04em; font-size:.7rem">{{ check.group }}</td>
+                                <tr class="row-group">
+                                    <th colspan="2" scope="colgroup">{{ check.group }}</th>
                                 </tr>
                                 {% endif %}
                                 <tr data-level="{{ check.status == 'error' ? 'error' : (check.status == 'warning' ? 'warning' : '') }}">
@@ -412,7 +412,7 @@
                         your deployment configuration. They take effect immediately across all open tabs.
                     </p>
 
-                    <div>
+                    <div class="grid">
 
                         {# Default view #}
                         <div>
@@ -443,7 +443,7 @@
                     <hr>
                     <h6 class="muted upper">Graph defaults</h6>
 
-                    <div>
+                    <div class="grid">
 
                         {# Default graph display #}
                         <div>
@@ -487,7 +487,7 @@
                     <hr>
                     <h6 class="muted upper">Flow &amp; statistics defaults</h6>
 
-                    <div>
+                    <div class="grid">
 
                         {# Default flow limit #}
                         <div>
@@ -519,7 +519,7 @@
                     <hr>
                     <h6 class="muted upper">Date &amp; time display</h6>
 
-                    <div>
+                    <div class="grid">
                         <div>
                             <label class="strong muted">Timezone</label>
                             <div class="help">Choose which timezone to use when displaying dates in charts and timestamps.</div>
@@ -545,7 +545,7 @@
                     <hr>
                     <h6 class="muted upper">Filter presets</h6>
 
-                    <div>
+                    <div class="grid">
                         <div>
                             <label class="strong muted">
                                 nfdump filter presets
