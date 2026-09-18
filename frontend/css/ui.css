@@ -29,7 +29,8 @@ html {
 
 body {
     min-block-size: 100dvb;
-    padding: var(--size-2);
+    /* The page should not run into the window edge. */
+    padding: var(--size-3) var(--size-4);
     background: var(--surface-1);
     color: var(--text-1);
     font-family: var(--font-sans);
@@ -286,7 +287,7 @@ a:hover {
 }
 
 .card-body {
-    padding: var(--size-4);
+    padding: var(--size-5);
 }
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
@@ -733,6 +734,7 @@ td {
 }
 
 thead th {
+    padding-block: var(--size-3);
     border-block-end: 2px solid var(--border);
     color: var(--text-1);
     font-weight: var(--font-weight-semibold);

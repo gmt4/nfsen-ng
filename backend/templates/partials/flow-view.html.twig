@@ -27,7 +27,7 @@
      data-computed:flows._config="{{ '{' }} sources: ${{ graph_sources.id() }}, protocols: ['any'], ports: [], display: ((${{ graph_sources.id() }}.includes('any') || ${{ graph_sources.id() }}.length === 0 ? {{ sources|length }} : ${{ graph_sources.id() }}.length) > 1 ? 'sources' : 'protocols'), type: (${{ flows_graph_unit.id() }} === 'bytes' ? 'traffic' : ${{ flows_graph_unit.id() }}), trafficUnit: 'bytes', logscale: false, stacked: false, stepplot: true, displayTz: ${{ displayTz.id() }}, nfcapdTz: ${{ nfcapdTz.id() }} {{ '}' }}">
     <div>
         <div class="card">
-            <div class="card-body">
+            <div class="card-body stack">
                 {#
                     A disclosure, not a second submit button. Sitting beside Process data it
                     read as an alternative way to run the query, when it only opens a section
@@ -148,7 +148,7 @@
         {# Results card — shown after the first query #}
         <div data-show="$_flows_queried">
         <div class="card" data-class:loading="${{ query_running.id() }}">
-            <div class="card-body">
+            <div class="card-body stack">
                 <div class="cluster cluster-between">
                     <h5 class="strong">Network Flows</h5>
                     <div class="cluster">

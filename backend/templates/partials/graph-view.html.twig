@@ -95,10 +95,10 @@
     </div>
 
     {# Graph options panel #}
-    <div  id="graphOptions">
+    <div id="graphOptions" class="filter-grid">
 
         {# Resolution slider #}
-        <div>
+        <div class="filter-cell filter-cell--wide">
             <div class="filter-group">
             <p class="filter-label">Resolution</p>
             <div>
@@ -120,7 +120,7 @@
         </div>
 
         {# Graph scale #}
-        <div>
+        <div class="filter-cell">
             <div class="filter-group">
             <p class="filter-label">Graph Scale</p>
             <div class="segmented"  role="group" id="graph_linlog">
@@ -139,7 +139,7 @@
         </div>
 
         {# Series display #}
-        <div>
+        <div class="filter-cell">
             <div class="filter-group">
             <p class="filter-label">Series Display</p>
             <div class="segmented"  role="group"
@@ -170,7 +170,7 @@
            data-ignore-morph/data-ignore: this div is empty in the server-rendered HTML and
            filled in entirely by JS; without these, an SSE-pushed morph shortly after load
            wipes the checkboxes back out before the user ever sees them. #}
-        <div>
+        <div class="filter-cell">
             <div class="filter-group">
             <p class="filter-label">Series Visibility</p>
             <div id="series" data-ignore-morph data-ignore></div>
@@ -178,7 +178,7 @@
         </div>
 
         {# Chart legend — populated by nfsen-chart on hover; same data-ignore-morph reasoning as #series #}
-        <div>
+        <div class="filter-cell">
             <div class="filter-group">
             <p class="filter-label">Legend</p>
             <div id="legend" data-ignore-morph data-ignore></div>
