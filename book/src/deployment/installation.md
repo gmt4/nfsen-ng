@@ -184,13 +184,17 @@ The ready-to-use `deploy/systemd/nfcapd.service` unit already uses
 
 ### Install the stack
 
+> **Not `ppa:ondrej/php` on Ubuntu 26.04.** That PPA is being merged into
+> `packages.sury.org` and now builds only for Jammy (22.04) and Noble (24.04) —
+> there is no Resolute (26.04) build. Sury serves `jammy`, `noble`, `resolute`,
+> `bullseye`, `bookworm` and `trixie`, so the `lsb_release -sc` line below is the
+> one path for both distributions. On 22.04/24.04 the PPA still works if you
+> already use it.
+
 ```bash
 # As root.
 
-# --- PHP 8.4 repository ---
-# Ubuntu:
-add-apt-repository -y ppa:ondrej/php
-# Debian:
+# --- PHP 8.4 repository (Sury — Debian and Ubuntu alike) ---
 apt install -y apt-transport-https lsb-release ca-certificates curl gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/sury-php.gpg
@@ -200,6 +204,7 @@ apt update
 apt install -y git pkg-config brotli \
     php8.4 php8.4-dev php8.4-xml php8.4-mbstring php8.4-curl \
     rrdtool librrd-dev \
+    libssl-dev libcurl4-openssl-dev libnghttp2-dev \
     flex bison libbz2-dev zlib1g-dev build-essential autoconf automake libtool unzip wget
 
 # --- nfdump 1.7.8 from source (matches the Docker image) ---
@@ -210,8 +215,11 @@ cd ..
 # binary is now /usr/local/nfdump/bin/nfdump
 
 # --- PHP extensions ---
-# openswoole + inotify + brotli via PECL:
-pecl install openswoole inotify
+# openswoole + inotify + brotli via PECL. openswoole asks six build questions —
+# -D answers them with the options the Docker image uses (see the note below):
+pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes"
+    enable-mysqlnd="no" enable-hook-curl="yes" with-postgres="no"' openswoole
+pecl install inotify
 echo "extension=openswoole.so" > /etc/php/8.4/mods-available/openswoole.ini
 echo "extension=inotify.so"    > /etc/php/8.4/mods-available/inotify.ini
 pecl install rrd
@@ -237,6 +245,16 @@ $EDITOR backend/settings/settings.php   # set sources, ports, nfdump.binary, pro
 # Start the HTTP server (listens on port 9000):
 sudo -u www-data php backend/app.php
 ```
+
+> **Why the `-D` flags.** Plain `pecl install openswoole` stops at six build
+> prompts (`enable coroutine sockets?`, `enable openssl support?`, …) and a
+> copy-pasted script just hangs there; `-D` answers them up front with the same
+> options the Docker image builds through `install-php-extensions`.
+> `enable-openssl="yes"` is not optional — alert webhooks to `https://` URLs use
+> OpenSwoole's coroutine HTTP client, which cannot do TLS without it. Keep the
+> inner quotes and don't fold the list with a `\` continuation: PEAR parses it as
+> XML attributes, and either mistake drops every option without a word — the
+> prompts come straight back.
 
 On a bare-metal install point `nfdump.binary` (or `NFSEN_NFDUMP_BINARY`) at
 `/usr/local/nfdump/bin/nfdump` if you compiled it as above. On first start the
